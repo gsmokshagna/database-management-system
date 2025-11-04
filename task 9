@@ -1,0 +1,57 @@
+Task 9: Backup and Recovery in Database
+
+Aim:
+To devise, implement, and manage a backup and recovery strategy in the database.
+
+Description:
+The primary backup administrator typically takes responsibility for the following:
+1. Planning and testing responses to different kinds of failures.
+2. Designing the database environment for backup and recovery.
+3. Setting up a backup schedule.
+4. Implementing backup and recovery strategies.
+
+Data Archival:
+Data archival is though related to data protection, it serves a different purpose. An archival backup is known as an archival backup if it stores data for long-term retention. For example, it forms your backup set as a convenient way to create a backup and store it.
+
+Recovery Manager (RMAN):
+Recovery Manager is fully integrated with the Oracle database to perform a range of backup and recovery activities, including maintaining RMAN repository of historical data about backups. You can access RMAN through the command line or through Oracle Enterprise Manager.
+
+Steps to Recover a Lost Control File using RMAN:
+
+1) Start RMAN and connect to the target database with a backup connection using RMAN.
+2) If the database instance is started at the time of the loss of the server parameter file:
+   - If the database instance is not started when the server parameter file is lost, do one of the following:
+     a) Start the database instance and restore the server parameter file from autobackup.
+     b) Without mounting the database, once the server parameter file is not available, start RMAN and restore it.
+
+Command:
+STARTUP FORCE NOMOUNT;
+
+3) After restoring the server parameter file, mount the database with the following command:
+   ALTER DATABASE OPEN RESETLOGS;
+
+4) Use the following RMAN command to restore the control file autobackup:
+   SET CONTROLFILE AUTOBACKUP FOR DEVICE TYPE DISK TO <location>;
+
+5) Allocate a channel manually if necessary:
+   ALLOCATE CHANNEL FOR DEVICE TYPE DISK;
+   If autobackups were not produced with default format, specify the correct autobackup format using:
+   SET CONTROLFILE AUTOBACKUP FORMAT FOR DEVICE TYPE DISK TO '<path>';
+
+6) Restore the autobackup of the control file optimally by setting the maximum number of days of backup that RMAN can search and its sequence number to the resultant file.
+
+7) After restoring, mount the database with:
+   STARTUP NOMOUNT;
+
+8) Recover the database and open it using:
+   ALTER DATABASE OPEN RESETLOGS;
+
+Steps using RMAN Tool:
+1) Create a new project in RMAN.
+2) Define the relational schema and functional dependencies.
+3) Run the “dependency graph” tool.
+4) Analyze transformation using normalization issues.
+5) Verify by the resulting schema.
+
+Result:
+Thus the task is done and verified.
