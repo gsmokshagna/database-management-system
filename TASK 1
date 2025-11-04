@@ -1,0 +1,102 @@
+-- PostgreSQL DDL implementing the ER diagram you sketched
+
+-- ROLES
+CREATE TABLE roles (
+  role_id       SERIAL PRIMARY KEY,
+  role_name     VARCHAR(100) NOT NULL,
+  role_desc     TEXT
+);
+
+-- USERS
+CREATE TABLE users (
+  user_id       SERIAL PRIMARY KEY,
+  username      VARCHAR(100) NOT NULL UNIQUE,
+  user_mobile   VARCHAR(20),
+  user_email    VARCHAR(255),
+  user_address  TEXT
+);
+
+-- LOGIN (each login row belongs to a user and refers to a role)
+CREATE TABLE logins (
+  login_id      SERIAL PRIMARY KEY,
+  user_id       INT NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+  login_role_id INT NOT NULL REFERENCES roles(role_id) ON DELETE RESTRICT,
+  login_username VARCHAR(150) NOT NULL,
+  login_password VARCHAR(255) NOT NULL,   -- store hashed password
+  UNIQUE(user_id, login_username)
+);
+
+-- PERMISSIONS (permissions can be linked to roles; you may also want role_permissions join table)
+CREATE TABLE permissions (
+  perm_id       SERIAL PRIMARY KEY,
+  perm_name     VARCHAR(100) NOT NULL,
+  perm_description TEXT
+);
+
+-- role_permissions (many-to-many roles <-> permissions)
+CREATE TABLE role_permissions (
+  role_id   INT NOT NULL REFERENCES roles(role_id) ON DELETE CASCADE,
+  perm_id   INT NOT NULL REFERENCES permissions(perm_id) ON DELETE CASCADE,
+  PRIMARY KEY(role_id, perm_id)
+);
+
+-- TICKETS
+CREATE TABLE tickets (
+  ticket_id    SERIAL PRIMARY KEY,         -- #tck_id
+  tck_cus_id   INT NOT NULL REFERENCES users(user_id) ON DELETE SET NULL,
+  tck_date     TIMESTAMP WITH TIME ZONE DEFAULT now(),
+  tck_desc     TEXT,
+  tck_type     VARCHAR(50)
+);
+
+-- METRO (metro vehicles/runs)
+CREATE TABLE metros (
+  metro_id      SERIAL PRIMARY KEY,        -- #met_id
+  metro_name    VARCHAR(150) NOT NULL,
+  metro_desc    TEXT,
+  metro_ticket  VARCHAR(50),               -- maybe a ticket code/label
+  metro_seat_num INT
+);
+
+-- ROUTES
+CREATE TABLE routes (
+  route_id     SERIAL PRIMARY KEY,         -- #mtru_id or #mtru? renamed route_id
+  route_desc   TEXT,
+  route_type   VARCHAR(50)
+);
+
+-- route_metro mapping (a metro can operate on many routes and a route can have many metros)
+CREATE TABLE metro_routes (
+  metro_id  INT NOT NULL REFERENCES metros(metro_id) ON DELETE CASCADE,
+  route_id  INT NOT NULL REFERENCES routes(route_id) ON DELETE CASCADE,
+  PRIMARY KEY (metro_id, route_id)
+);
+
+-- FARES (fares for tickets or routes)
+CREATE TABLE fares (
+  fare_id     SERIAL PRIMARY KEY,          -- #fare_id
+  fare_title  VARCHAR(150),
+  fare_desc   TEXT,
+  fare_type   VARCHAR(50),
+  fare_ticket_id INT REFERENCES tickets(ticket_id) ON DELETE SET NULL
+);
+
+-- OPTIONAL: user_roles if users can have multiple roles (diagram suggests "Has" relationship)
+CREATE TABLE user_roles (
+  user_id INT NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+  role_id INT NOT NULL REFERENCES roles(role_id) ON DELETE CASCADE,
+  PRIMARY KEY(user_id, role_id)
+);
+
+-- OPTIONAL: manage/administration relationship
+-- If "Manage" links users to metros or tickets, create a manage table. Example: user manages metros
+CREATE TABLE manages_metros (
+  user_id  INT NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+  metro_id INT NOT NULL REFERENCES metros(metro_id) ON DELETE CASCADE,
+  role     VARCHAR(50),
+  PRIMARY KEY(user_id, metro_id)
+);
+
+-- Indexes to speed lookups
+CREATE INDEX idx_tickets_customer ON tickets(tck_cus_id);
+CREATE INDEX idx_logins_user ON logins(user_id);
