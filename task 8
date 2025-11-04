@@ -1,0 +1,68 @@
+-- TASK 8: Normalizing Database Using Functional Dependencies (BCNF)
+
+-- Step 1: Identify Employee Attributes
+-- Attributes: Employee_ID, Name, Department, Job_Title, Manager_ID, Hire_Date, Salary
+
+-- Step 2: Define Relation Schema
+CREATE TABLE Employee (
+    Employee_ID SERIAL PRIMARY KEY,
+    Name VARCHAR(100) NOT NULL,
+    Department VARCHAR(100),
+    Job_Title VARCHAR(100),
+    Manager_ID INT,
+    Hire_Date DATE,
+    Salary DECIMAL(10,2)
+);
+
+-- Step 3: Determine Functional Dependencies
+-- FDs:
+-- Employee_ID → Name, Department, Job_Title, Manager_ID, Hire_Date, Salary
+-- Department → Manager_ID
+-- Manager_ID → Name
+
+-- Step 4: Convert to 1NF
+-- (Already in 1NF — no repeating groups)
+
+-- Step 5: Convert to 2NF
+-- Remove partial dependencies if any (none here since Employee_ID is the primary key)
+
+-- Step 6: Convert to 3NF
+-- Remove transitive dependencies (Manager_ID → Name)
+-- Create separate tables for Manager and Department
+
+CREATE TABLE Managers (
+    Manager_ID SERIAL PRIMARY KEY,
+    Name VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE Department (
+    Department_ID SERIAL PRIMARY KEY,
+    Department_Name VARCHAR(100) NOT NULL,
+    Manager_ID INT REFERENCES Managers(Manager_ID)
+);
+
+-- Step 7: Convert to BCNF
+-- Ensure every determinant is a candidate key (achieved with decomposition)
+-- No further decomposition needed
+
+-- Step 8: Final Normalized Schema (BCNF)
+
+-- Employee table (referencing Department and Manager)
+CREATE TABLE Employee_Normalized (
+    Employee_ID SERIAL PRIMARY KEY,
+    Name VARCHAR(100) NOT NULL,
+    Department_ID INT REFERENCES Department(Department_ID),
+    Job_Title VARCHAR(100),
+    Manager_ID INT REFERENCES Managers(Manager_ID),
+    Hire_Date DATE,
+    Salary DECIMAL(10,2)
+);
+
+-- Step 9: Verification using Griffith Tool (as per notes)
+-- 1) Input relational schema and FDs
+-- 2) Generate dependency graph
+-- 3) Apply normalization rules
+-- 4) Verify resulting schema
+
+-- Result:
+-- Database successfully normalized up to BCNF.
