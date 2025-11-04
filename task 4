@@ -1,0 +1,76 @@
+-- Task 4: Developing queries with DML Multi-row functions and operations
+
+-- Create table
+CREATE TABLE student (
+    student_id INT,
+    std_name VARCHAR(50),
+    std_course VARCHAR(10),
+    std_marks INT,
+    admission_date DATE
+);
+
+-- Insert values
+INSERT INTO student VALUES
+(201, 'Arjun', 'CSE', 85, '2020-09-12'),
+(202, 'Meena', 'ECE', 78, '2024-08-19'),
+(203, 'Shani', 'CSE', 91, '2021-03-28'),
+(204, 'Poora', 'CSE', 90, '2024-02-01'),
+(205, 'Sonu', 'MEC', 81, '2020-04-03'),
+(206, 'Sam', 'MEC', 79, '2018-10-21'),
+(207, 'Rose', 'ECE', 79, '2020-01-13'),
+(208, 'Manu', 'CSE', 80, '2019-03-21');
+
+-- 1) Highest and lowest marks
+SELECT MAX(std_marks) AS Highest, MIN(std_marks) AS Lowest FROM student;
+
+-- 2) Count total students
+SELECT COUNT(*) AS Total_Students FROM student;
+
+-- 3) Average marks
+SELECT AVG(std_marks) AS Average_Marks FROM student;
+
+-- 4) Total marks
+SELECT SUM(std_marks) AS Total_Marks FROM student;
+
+-- 5) Find average marks group-wise
+SELECT std_course, AVG(std_marks) AS Avg_Marks 
+FROM student 
+GROUP BY std_course;
+
+-- 6) Find max marks in each course
+SELECT std_course, MAX(std_marks) AS Max_Marks 
+FROM student 
+GROUP BY std_course;
+
+-- 7) Count students course-wise
+SELECT std_course, COUNT(*) AS Student_Count 
+FROM student 
+GROUP BY std_course;
+
+-- 8) Find total marks course-wise
+SELECT std_course, SUM(std_marks) AS Total_Marks 
+FROM student 
+GROUP BY std_course;
+
+-- 9) Find course having avg marks > 80
+SELECT std_course, AVG(std_marks) AS Avg_Marks 
+FROM student 
+GROUP BY std_course 
+HAVING AVG(std_marks) > 80;
+
+-- 10) Count students admitted year-wise
+SELECT YEAR(admission_date) AS Year_Admitted, COUNT(*) AS Student_Count 
+FROM student 
+GROUP BY YEAR(admission_date);
+
+-- 11) Find course with max number of students
+SELECT std_course, COUNT(*) AS Student_Count 
+FROM student 
+GROUP BY std_course 
+ORDER BY Student_Count DESC 
+LIMIT 1;
+
+-- 12) Find min marks in each course
+SELECT std_course, MIN(std_marks) AS Min_Marks 
+FROM student 
+GROUP BY std_course;
