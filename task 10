@@ -1,0 +1,60 @@
+// === CRUD OPERATIONS IN MONGODB ===
+
+// CREATE Operation
+> db.createCollection("mylab")
+{ "ok" : 1 }
+
+> db.mylab.insertOne({
+    item: "canvas",
+    qty: 100,
+    tags: ["cotton"],
+    size: { h: 28, w: 35.5, uom: "cm" }
+})
+{
+    "acknowledged": true,
+    "insertedId": ObjectId("627d13acc79990cc0ae6379c")
+}
+
+> db.mylab.insertMany([
+    {
+        item: "journal",
+        qty: 25,
+        tags: ["black", "red"],
+        size: { h: 14, w: 21, uom: "cm" }
+    },
+    {
+        item: "mat",
+        qty: 85,
+        tags: ["gray"],
+        size: { h: 27.9, w: 35.5, uom: "cm" }
+    },
+    {
+        item: "mousepad",
+        qty: 25,
+        tags: ["gel", "blue"],
+        size: { h: 19, w: 22.85, uom: "cm" }
+    }
+])
+
+// READ Operation
+> db.mylab.find()
+> db.mylab.find({ item: "canvas" })
+> db.mylab.find({ qty: { $gt: 50 } })
+
+// UPDATE Operation
+> db.mylab.updateOne(
+    { item: "canvas" },
+    { $set: { qty: 150, "size.uom": "m" } }
+)
+
+> db.mylab.updateMany(
+    { "size.uom": "cm" },
+    { $set: { "size.uom": "m" }, $currentDate: { lastModified: true } }
+)
+
+// DELETE Operation
+> db.mylab.deleteOne({ item: "journal" })
+
+> db.mylab.deleteMany({ qty: { $lt: 50 } })
+
+// === END OF CRUD OPERATIONS ===
