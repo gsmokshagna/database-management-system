@@ -1,0 +1,51 @@
+Syntax:
+CREATE (node1)-[:RELATIONSHIP_TYPE]->(node2)
+
+This syntax creates a relationship between the existing nodes.
+You can also create a relationship between the existing nodes using the MATCH clause.
+
+---
+
+Syntax:
+MATCH (a: LabelOfNode1), (b: LabelOfNode2)
+WHERE a.name = "name of Node1" AND b.name = "name of Node2"
+CREATE (a)-[:RELATIONSHIP]->(b)
+RETURN a, b
+
+---
+
+Deleting a Particular Node:
+To delete a particular node, you need to specify the node in the place of "n" in the above query.
+
+Syntax:
+MATCH (node: label {properties...})
+DETACH DELETE node
+
+---
+
+Example Queries:
+
+CREATE (n1: student {sid: "VTU1500", sname: "John", deptname: "CSE"});
+Output:
+Added 1 label, created 1 node, set 3 properties, completed after 232 ms.
+
+---
+
+CREATE (n1: student {sid: "VTU1501", sname: "Bharasana", deptname: "CSE"});
+Output:
+Added 1 label, created 1 node, set 3 properties, completed after 16 ms.
+
+---
+
+CREATE (n1: student {sid: "VTU1502", sname: "Vijay", deptname: "CSE"});
+Output:
+Added 1 label, created 1 node, set 3 properties, completed after 12 ms.
+
+---
+
+CREATE (n1: dept {deptname: "CSE", deptid: "D001"});
+Output:
+Added 1 label, created 1 node, set 2 properties, completed after 22 ms.
+
+---
+
