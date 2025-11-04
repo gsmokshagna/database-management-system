@@ -1,0 +1,103 @@
+-- 🧱 TABLE CREATION
+CREATE TABLE student (
+  std_id INT PRIMARY KEY,
+  name VARCHAR(50),
+  course VARCHAR(10),
+  marks INT,
+  admission_date DATE
+);
+
+CREATE TABLE course (
+  course VARCHAR(10) PRIMARY KEY,
+  dept_head VARCHAR(50),
+  credit INT
+);
+
+-- 🧾 DATA INSERTION
+INSERT INTO student VALUES
+(201, 'Arjun', 'CSE', 85, '2020-02-12'),
+(202, 'Meera', 'ECE', 88, '2024-08-17'),
+(203, 'Bhavi', 'CSE', 91, '2024-03-28'),
+(204, 'Pravi', 'CSE', 90, '2024-02-01'),
+(205, 'Jomu',  'MEC', 81, '2020-01-03');
+
+INSERT INTO course VALUES
+('CSE', 'Dr. Rao', 4),
+('ECE', 'Dr. Anita', 3),
+('MEC', 'Dr. Vikas', 5);
+
+---------------------------------------------------
+-- 🔹 TASK 1: INNER JOIN – Students with Dept Head
+---------------------------------------------------
+SELECT s.name, s.course, c.dept_head
+FROM student s
+INNER JOIN course c ON s.course = c.course;
+
+---------------------------------------------------
+-- 🔹 TASK 2: LEFT JOIN – All Students (Include No Match)
+---------------------------------------------------
+SELECT s.name, c.dept_head
+FROM student s
+LEFT JOIN course c ON s.course = c.course;
+
+---------------------------------------------------
+-- 🔹 TASK 3: RIGHT JOIN – All Departments (Include No Student)
+---------------------------------------------------
+SELECT s.name, s.course, c.dept_head
+FROM student s
+RIGHT JOIN course c ON s.course = c.course;
+
+---------------------------------------------------
+-- 🔹 TASK 4: FULL OUTER JOIN – Combine All Students and Departments
+---------------------------------------------------
+SELECT s.name, s.course, c.dept_head
+FROM student s
+FULL OUTER JOIN course c ON s.course = c.course;
+
+---------------------------------------------------
+-- 🔹 TASK 5: EQUI JOIN – Students in CSE Department
+---------------------------------------------------
+SELECT name
+FROM student
+WHERE course = 'CSE';
+
+---------------------------------------------------
+-- 🔹 TASK 6: Students Scoring >80 with Dept Head
+---------------------------------------------------
+SELECT s.name, s.marks, c.dept_head
+FROM student s
+JOIN course c ON s.course = c.course
+WHERE s.marks > 80;
+
+---------------------------------------------------
+-- 🔹 TASK 7: Course Credits of Each Student
+---------------------------------------------------
+SELECT s.name, s.course, c.credit
+FROM student s
+JOIN course c ON s.course = c.course;
+
+---------------------------------------------------
+-- 🔹 TASK 8: Dept Heads with More than 2 Students
+---------------------------------------------------
+SELECT c.dept_head, COUNT(*) AS student_count
+FROM student s
+JOIN course c ON s.course = c.course
+GROUP BY c.dept_head
+HAVING COUNT(*) >= 2;
+
+---------------------------------------------------
+-- 🔹 TASK 9: Students Admitted After 2020
+---------------------------------------------------
+SELECT s.name, s.admission_date, c.dept_head
+FROM student s
+JOIN course c ON s.course = c.course
+WHERE s.admission_date > '2020-12-31';
+
+---------------------------------------------------
+-- 🔹 TASK 10: Nested Query – Students with Marks > Average Marks
+---------------------------------------------------
+SELECT s.name, s.course, s.marks
+FROM student s
+WHERE s.marks > (
+  SELECT AVG(marks) FROM student
+);
