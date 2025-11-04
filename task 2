@@ -1,0 +1,96 @@
+CREATE TABLE zone (
+    zone_id INT PRIMARY KEY,
+    zone_name VARCHAR(100) NOT NULL,
+    zone_code VARCHAR(10) UNIQUE
+);
+CREATE TABLE station (
+    station_id INT PRIMARY KEY,
+    station_no VARCHAR(10) UNIQUE,
+    station_code VARCHAR(100) NOT NULL,
+    station_name VARCHAR(100) NOT NULL,
+    zone_id INT,
+    FOREIGN KEY (zone_id) REFERENCES zone(zone_id)
+);
+CREATE TABLE class (
+    class_id INT PRIMARY KEY,
+    class_code VARCHAR(10) UNIQUE,
+    class_name VARCHAR(100) NOT NULL
+);
+CREATE TABLE train (
+    train_id INT PRIMARY KEY,
+    train_code VARCHAR(10),
+    train_name VARCHAR(100),
+    distance INT,
+    start_time TIME,
+    end_time TIME,
+    start_station_code VARCHAR(10),
+    end_station_code VARCHAR(10)
+);
+CREATE TABLE train_fare (
+    train_code VARCHAR(10),
+    class_id INT,
+    from_km INT,
+    to_km INT,
+    from_date DATE,
+    to_date DATE,
+    fare DECIMAL(10,2),
+    PRIMARY KEY (train_code, class_id),
+    FOREIGN KEY (train_code) REFERENCES train(train_code),
+    FOREIGN KEY (class_id) REFERENCES class(class_id)
+);
+CREATE TABLE via_details (
+    details_id INT PRIMARY KEY,
+    train_code VARCHAR(10),
+    via_station_name VARCHAR(100),
+    km_from_origin INT,
+    reach_time TIME,
+    FOREIGN KEY (train_code) REFERENCES train(train_code)
+);
+CREATE TABLE passenger (
+    pnr_no BIGINT PRIMARY KEY,
+    pnr_name VARCHAR(100),
+    pnr_age INT,
+    pnr_gender CHAR(1),
+    seat_no VARCHAR(10),
+    fare DECIMAL(10,2)
+);
+CREATE TABLE login_credentials (
+    login_id VARCHAR(50) PRIMARY KEY,
+    password VARCHAR(50) NOT NULL
+);
+CREATE TABLE payment_info (
+    payment_id INT PRIMARY KEY,
+    pnr_no BIGINT,
+    pnr_type VARCHAR(50),
+    int_amt VARCHAR(30),
+    pay_mode VARCHAR(50),
+    pay_date DATE,
+    amount DECIMAL(10,2),
+    FOREIGN KEY (pnr_no) REFERENCES passenger(pnr_no)
+);
+CREATE TABLE refund_table (
+    refund_id INT PRIMARY KEY,
+    pnr_no BIGINT,
+    refundable_amt DECIMAL(10,2),
+    FOREIGN KEY (pnr_no) REFERENCES passenger(pnr_no)
+);
+CREATE TABLE stops (
+    train_code VARCHAR(10),
+    station_id INT,
+    PRIMARY KEY (train_code, station_id),
+    FOREIGN KEY (train_code) REFERENCES train(train_code),
+    FOREIGN KEY (station_id) REFERENCES station(station_id)
+);
+INSERT INTO zone VALUES (1, 'North Zone', 'NZ');
+INSERT INTO zone VALUES (2, 'South Zone', 'SZ');
+INSERT INTO zone VALUES (3, 'Central Zone', 'CZ');
+UPDATE zone 
+SET zone_code = 'SZ2'
+WHERE zone_id = 2;
+DELETE FROM zone
+WHERE zone_name = 'North Zone';
+SELECT * FROM zone;
+REVOKE INSERT ON zone FROM user_name;
+COMMIT;
+ROLLBACK;
+SAVEPOINT sp1;
