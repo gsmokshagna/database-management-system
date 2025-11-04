@@ -1,0 +1,86 @@
+-- TASK 7: Triggers, Views, and Exceptions in PL/SQL
+-- =================================================
+
+-- 1️⃣ CREATE TRIGGER
+-- Automatically insert into match_result table when a new record is inserted into match table.
+
+CREATE OR REPLACE TRIGGER insert_match_result
+AFTER INSERT ON match
+FOR EACH ROW
+BEGIN
+  INSERT INTO match_result (matchid, teamid, result)
+  VALUES (:NEW.matchid, :NEW.teamid, 'Pending');
+  -- Assuming default result as 'Pending'
+END;
+/
+-- ✅ OUTPUT:
+-- Trigger created successfully.
+-- When a new record is inserted into MATCH, a corresponding entry is auto-inserted into MATCH_RESULT.
+
+
+
+-- 2️⃣ CREATE VIEW (Player and Team details)
+
+CREATE OR REPLACE VIEW players_team_details AS
+SELECT 
+  p.playerid,
+  p.fname AS player_name,
+  p.teamid,
+  (SELECT t.coach FROM team t WHERE t.teamid = p.teamid) AS team_coach,
+  (SELECT t.captain FROM team t WHERE t.teamid = p.teamid) AS team_captain
+FROM players p;
+/
+-- ✅ OUTPUT:
+-- View created successfully.
+-- You can now query:
+-- SELECT * FROM players_team_details;
+
+
+
+-- 3️⃣ PROCEDURE: Get Even Player IDs for a Tournament (Non-recursive)
+
+CREATE OR REPLACE PROCEDURE get_even_players_id_for_tournament(
+  tournament_id IN NUMBER,
+  out_even_player_ids OUT SYS.ODCINUMBERLIST
+)
+IS
+BEGIN
+  -- Initialize collection
+  out_even_player_ids := SYS.ODCINUMBERLIST();
+  
+  -- Populate collection with even-numbered player IDs
+  FOR player_rec IN (
+    SELECT playerid 
+    FROM players 
+    WHERE tournamentid = tournament_id 
+      AND MOD(playerid, 2) = 0
+  ) LOOP
+    out_even_player_ids.EXTEND;
+    out_even_player_ids(out_even_player_ids.COUNT) := player_rec.playerid;
+  END LOOP;
+END;
+/
+-- ✅ OUTPUT:
+-- Procedure created successfully.
+
+
+
+-- 4️⃣ EXECUTION BLOCK TO DISPLAY EVEN PLAYER IDs
+
+DECLARE
+  tournament_id NUMBER := 128;   -- Replace with actual tournament ID
+  even_player_ids SYS.ODCINUMBERLIST;
+BEGIN
+  get_even_players_id_for_tournament(tournament_id, even_player_ids);
+
+  FOR i IN 1 .. even_player_ids.COUNT LOOP
+    DBMS_OUTPUT.PUT_LINE('Even Player ID: ' || even_player_ids(i));
+  END LOOP;
+END;
+/
+-- ✅ OUTPUT (Example):
+-- Even Player ID: 2
+-- Even Player ID: 4
+-- Even Player ID: 6
+-- Even Player ID: 8
+
