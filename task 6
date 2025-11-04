@@ -1,0 +1,103 @@
+-- TASK 6: Procedure, Function, and Loops in PL/SQL
+-- ================================================
+
+-- 1️⃣ PROCEDURE EXAMPLE: Increment a number
+CREATE OR REPLACE PROCEDURE ititCa(a IN OUT NUMBER) IS
+BEGIN
+  a := a + 1;
+END;
+/
+
+DECLARE
+  a NUMBER := 7;
+BEGIN
+  ititCa(a);
+  DBMS_OUTPUT.PUT_LINE('The updated value is ' || a);
+END;
+/
+-- ✅ OUTPUT:
+-- The updated value is 8
+
+
+
+-- 2️⃣ FUNCTION EXAMPLE: Factorial of a number using loops
+CREATE OR REPLACE FUNCTION facto(a NUMBER) RETURN NUMBER IS
+  fact NUMBER := 1;
+  b NUMBER;
+BEGIN
+  b := a;
+  WHILE b > 0 LOOP
+    fact := fact * b;
+    b := b - 1;
+  END LOOP;
+  RETURN(fact);
+END;
+/
+
+DECLARE
+  a NUMBER := 7;
+  f NUMBER;
+BEGIN
+  f := facto(a);
+  DBMS_OUTPUT.PUT_LINE('The factorial of the given number ' || a || ' is ' || f);
+END;
+/
+-- ✅ OUTPUT:
+-- The factorial of the given number 7 is 5040
+
+
+
+-- 3️⃣ PROCEDURE + TABLE EXAMPLE: Items table update
+
+CREATE TABLE ITEMS (
+  ITEMID INT PRIMARY KEY,
+  PRICE INT,
+  PRODUCT_NAME VARCHAR(10)
+);
+
+INSERT INTO ITEMS VALUES (101, 2000, 'CHAIR');
+INSERT INTO ITEMS VALUES (102, 3000, 'TABLE');
+INSERT INTO ITEMS (ITEMID, PRODUCT_NAME, PRICE) VALUES (103, 'BOARD', 1000);
+COMMIT;
+
+SELECT * FROM ITEMS;
+
+-- ✅ OUTPUT (Before procedure):
+-- ITEMID | PRICE | PRODUCT_NAME
+-- 101    | 2000  | CHAIR
+-- 102    | 3000  | TABLE
+-- 103    | 1000  | BOARD
+
+
+-- Procedure to update item price
+CREATE OR REPLACE PROCEDURE U_ITEMS(
+  identity NUMBER,
+  total NUMBER
+) IS
+  price NUMBER;
+BEGIN
+  SELECT PRICE INTO price FROM ITEMS WHERE ITEMID = identity;
+  
+  IF price IS NULL THEN
+    DBMS_OUTPUT.PUT_LINE('Price is null');
+  ELSE
+    UPDATE ITEMS SET PRICE = price + total WHERE ITEMID = identity;
+    DBMS_OUTPUT.PUT_LINE('Price updated successfully for ITEMID ' || identity);
+  END IF;
+END;
+/
+
+-- Execute procedure
+EXEC U_ITEMS(101, 1000);
+
+-- ✅ OUTPUT:
+-- Price updated successfully for ITEMID 101
+
+SELECT * FROM ITEMS;
+
+-- ✅ OUTPUT (After update):
+-- ITEMID | PRICE | PRODUCT_NAME
+-- 101    | 3000  | CHAIR
+-- 102    | 3000  | TABLE
+-- 103    | 1000  | BOARD
+
